@@ -1,0 +1,55 @@
+[
+  {
+    "id": "base-layer",
+    "name": "OpenStreetMap",
+    "type": "wms",
+    "visible": true,
+    "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "style": {
+      "opacity": 1
+    }
+  },
+  {
+    "id": "main-data",
+    "name": "Main Data Points",
+    "type": "vector",
+    "visible": true,
+    "datasource_name": null,
+    "latitudeColumn": "latitude",
+    "longitudeColumn": "longitude",
+    "tooltipColumns": ["name", "value", "category"],
+    "style": {
+      "color": "#1890ff",
+      "size": 10,
+      "opacity": 0.8
+    }
+  },
+  {
+    "id": "secondary-data",
+    "name": "Secondary Points",
+    "type": "vector",
+    "visible": true,
+    "datasource_name": "Secondary Dataset",
+    "latitudeColumn": "lat",
+    "longitudeColumn": "lon",
+    "tooltipColumns": ["title", "description"],
+    "style": {
+      "color": "#ff4d4f",
+      "size": 8,
+      "opacity": 0.6
+    }
+  },
+  {
+    "id": "geojson-layer",
+    "name": "GeoJSON Regions",
+    "type": "geojson",
+    "visible": true,
+    "url": "https://example.com/regions.geojson",
+    "style": {
+      "fillColor": "#52c41a",
+      "fillOpacity": 0.3,
+      "strokeColor": "#389e0d",
+      "strokeWidth": 2
+    }
+  }
+]

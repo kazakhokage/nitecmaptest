@@ -1,0 +1,25 @@
+{
+  "presets": [
+    ["@babel/preset-env", {
+      "modules": false,
+      "targets": {
+        "browsers": ["last 2 versions", "not dead"]
+      }
+    }],
+    ["@babel/preset-react", {
+      "runtime": "automatic"
+    }],
+    "@babel/preset-typescript"
+  ],
+  "env": {
+    "test": {
+      "presets": [
+        ["@babel/preset-env", {
+          "targets": {
+            "node": "current"
+          }
+        }]
+      ]
+    }
+  }
+}

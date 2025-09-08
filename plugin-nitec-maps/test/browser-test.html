@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nitec Maps Plugin - Browser Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .test {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+        .test.pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        .test.fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Nitec Maps Plugin - Browser Tests</h1>
+        
+        <p>Open this page at <code>http://localhost:8088/static/assets/test/browser-test.html</code> in a browser where Superset is running.</p>
+        
+        <button onclick="runTests()">Run Tests</button>
+        
+        <div id="results"></div>
+        
+        <div id="summary" class="summary" style="display:none;"></div>
+    </div>
+
+    <script>
+        let passed = 0;
+        let failed = 0;
+        const results = document.getElementById('results');
+        const summary = document.getElementById('summary');
+
+        function test(name, fn) {
+            const div = document.createElement('div');
+            div.className = 'test';
+            
+            try {
+                const result = fn();
+                if (result === false) {
+                    throw new Error('Test returned false');
+                }
+                div.className += ' pass';
+                div.innerHTML = `✅ <strong>${name}</strong>`;
+                passed++;
+            } catch (error) {
+                div.className += ' fail';
+                div.innerHTML = `❌ <strong>${name}</strong><br><code>${error.message}</code>`;
+                failed++;
+            }
+            
+            results.appendChild(div);
+        }
+
+        function runTests() {
+            results.innerHTML = '';
+            passed = 0;
+            failed = 0;
+
+            // Test 1: Check if require is available
+            test('Require.js is loaded', () => {
+                if (typeof require === 'undefined') {
+                    throw new Error('require is not defined - make sure you are on a Superset page');
+                }
+                return true;
+            });
+
+            // Test 2: Check if @superset-ui/core is available
+            test('@superset-ui/core is available', () => {
+                const core = require('@superset-ui/core');
+                if (!core) {
+                    throw new Error('@superset-ui/core not found');
+                }
+                return true;
+            });
+
+            // Test 3: Check VizType enum
+            test('VizType.NitecMaps is registered', () => {
+                const { VizType } = require('@superset-ui/core');
+                if (!VizType.NitecMaps) {
+                    throw new Error('VizType.NitecMaps not found');
+                }
+                if (VizType.NitecMaps !== 'nitec_maps') {
+                    throw new Error(`VizType.NitecMaps has wrong value: ${VizType.NitecMaps}`);
+                }
+                console.log('VizType.NitecMaps =', VizType.NitecMaps);
+                return true;
+            });
+
+            // Test 4: Check if plugin is loaded
+            test('Nitec Maps plugin is loaded', () => {
+                try {
+                    const plugin = require('@superset-ui/plugin-chart-nitec-maps');
+                    if (!plugin || !plugin.default) {
+                        throw new Error('Plugin module not found or missing default export');
+                    }
+                    return true;
+                } catch (e) {
+                    throw new Error(`Failed to load plugin: ${e.message}`);
+                }
+            });
+
+            // Test 5: Check plugin structure
+            test('Plugin has correct structure', () => {
+                const PluginClass = require('@superset-ui/plugin-chart-nitec-maps').default;
+                const plugin = new PluginClass();
+                
+                if (!plugin.metadata) throw new Error('Missing metadata');
+                if (!plugin.buildQuery) throw new Error('Missing buildQuery');
+                if (!plugin.transformProps) throw new Error('Missing transformProps');
+                if (!plugin.controlPanel) throw new Error('Missing controlPanel');
+                
+                return true;
+            });
+
+            // Test 6: Check metadata
+            test('Plugin metadata is correct', () => {
+                const PluginClass = require('@superset-ui/plugin-chart-nitec-maps').default;
+                const plugin = new PluginClass();
+                const metadata = plugin.metadata;
+                
+                if (metadata.name !== 'Nitec Maps') {
+                    throw new Error(`Wrong name: ${metadata.name}`);
+                }
+                if (metadata.category !== 'Maps') {
+                    throw new Error(`Wrong category: ${metadata.category}`);
+                }
+                if (!metadata.tags || !metadata.tags.includes('GIS')) {
+                    throw new Error('Missing GIS tag');
+                }
+                
+                console.log('Metadata:', metadata);
+                return true;
+            });
+
+            // Test 7: Check control panel
+            test('Control panel is configured', () => {
+                const PluginClass = require('@superset-ui/plugin-chart-nitec-maps').default;
+                const plugin = new PluginClass();
+                const controlPanel = plugin.controlPanel;
+                
+                if (!controlPanel.controlPanelSections) {
+                    throw new Error('Missing controlPanelSections');
+                }
+                
+                const sections = controlPanel.controlPanelSections;
+                const sectionLabels = sections.map(s => s.label);
+                
+                if (!sectionLabels.includes('Data')) {
+                    throw new Error('Missing Data section');
+                }
+                if (!sectionLabels.includes('Layers')) {
+                    throw new Error('Missing Layers section');
+                }
+                if (!sectionLabels.includes('Map Options')) {
+                    throw new Error('Missing Map Options section');
+                }
+                
+                console.log('Control panel sections:', sectionLabels);
+                return true;
+            });
+
+            // Test 8: Test chart loading
+            test('Chart component can be loaded', async () => {
+                const PluginClass = require('@superset-ui/plugin-chart-nitec-maps').default;
+                const plugin = new PluginClass();
+                
+                try {
+                    const ChartModule = await plugin.loadChart();
+                    if (!ChartModule || !ChartModule.default) {
+                        throw new Error('Chart component not found');
+                    }
+                    console.log('Chart loaded successfully');
+                    return true;
+                } catch (e) {
+                    throw new Error(`Failed to load chart: ${e.message}`);
+                }
+            });
+
+            // Show summary
+            summary.style.display = 'block';
+            summary.innerHTML = `
+                <h3>Test Summary</h3>
+                <p>✅ Passed: ${passed}</p>
+                <p>❌ Failed: ${failed}</p>
+                <p>📊 Total: ${passed + failed}</p>
+                ${failed === 0 ? '<p>🎉 All tests passed! The plugin is ready to use.</p>' : '<p>⚠️ Some tests failed. Check the errors above.</p>'}
+            `;
+
+            // Log to console for debugging
+            console.log('Test Results:', { passed, failed, total: passed + failed });
+        }
+
+        // Auto-run tests if on Superset page
+        if (window.location.hostname === 'localhost' && window.location.port === '8088') {
+            setTimeout(runTests, 1000);
+        }
+    </script>
+</body>
+</html>

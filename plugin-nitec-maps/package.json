@@ -1,0 +1,73 @@
+{
+  "name": "@superset-ui/plugin-chart-nitec-maps",
+  "version": "0.1.0",
+  "description": "Superset Chart - GIS map visualization with OpenLayers",
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "files": [
+    "esm",
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apache/superset.git",
+    "directory": "superset-frontend/plugins/plugin-nitec-maps"
+  },
+  "keywords": [
+    "superset",
+    "gis",
+    "map",
+    "openlayers"
+  ],
+  "author": "Superset",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/apache/superset/issues"
+  },
+  "homepage": "https://github.com/apache/superset/tree/master/superset-frontend/plugin-nitec-maps#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "npm run build-cjs && npm run build-esm && npm run ts-types",
+    "build-cjs": "tsc -p tsconfig.json",
+    "build-esm": "tsc -p tsconfig.json --module esnext --outDir esm",
+    "ts-types": "tsc -p tsconfig.json --declaration --emitDeclarationOnly",
+    "dev": "npm run build -- --watch",
+    "test": "jest",
+    "test:unit": "jest --selectProjects=unit",
+    "test:integration": "jest --selectProjects=integration",
+    "test:plugin": "jest --selectProjects=plugin-integration",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "verify": "node scripts/verify.js",
+    "clean": "rm -rf lib esm coverage *.tsbuildinfo",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "dependencies": {
+    "ol": "^10.6.1",
+    "ol-ext": "^4.0.18"
+  },
+  "peerDependencies": {
+    "@superset-ui/chart-controls": "*",
+    "@superset-ui/core": "^0.20.4",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "@playwright/test": "^1.39.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^12.1.5",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^30.0.0",
+    "babel-jest": "^30.0.5",
+    "jest": "^30.0.4",
+    "ts-jest": "^29.4.1"
+  }
+}
